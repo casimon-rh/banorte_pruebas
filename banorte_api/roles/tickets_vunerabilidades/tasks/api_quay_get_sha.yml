@@ -1,0 +1,19 @@
+---
+- name: get de los id de los reportes
+  uri:
+    url: https://example-registry-quay-openshift-operators.apps.cluster-fb9nt.fb9nt.sandbox2847.opentlc.com/api/v1/repository/adminquay/servicenow?vulnerabilities=true
+    headers:
+      Authorization: 'Bearer JwW3WTiLYjJBbfvbtfKkoBtzdZZ7HPF0c05KMkHp'
+    status_code: [200]
+    method: GET
+    body_format: json
+    validate_certs: no
+  register: _id_sha
+
+- name: register ids from quay
+  debug:
+    msg: "{{ _id_sha.json | json_query('tags.[*.manifest_digest]') }}"
+  register: _list_id
+
+- set_fact:
+    _list_sha: "{{ _list_id.msg }}"

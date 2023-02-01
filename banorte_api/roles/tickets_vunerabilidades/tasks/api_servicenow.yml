@@ -1,0 +1,12 @@
+---
+- name: get to reports
+  uri:
+    url: "https://example-registry-quay-openshift-operators.apps.cluster-jvd5r.jvd5r.sandbox2631.opentlc.com/api/v1/repository/servicenow/test/manifest/{{ item }}/security?vulnerabilities=true"
+    headers:
+      Authorization: 'Bearer YWRtaW46aW52YWRtaW4='
+    status_code: [200]
+    method: GET
+    body_format: json
+    validate_certs: no
+  with_items: "{{ _list_sha }}"
+  register: _list_reports

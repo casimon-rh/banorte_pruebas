@@ -1,0 +1,5 @@
+---
+- name: envio de tickes a service now
+  hosts: localhost
+  roles:
+    - tickets_vunerabilidades
