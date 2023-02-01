@@ -1,5 +1,36 @@
 ---
 - name: envio de tickes a service now
   hosts: localhost
-  roles:
-    - tickets_vunerabilidades
+  vars_files:
+    - creds.yaml
+  vars:
+    base_url: https://example-registry-quay-openshift-operators.apps.cluster-fb9nt.fb9nt.sandbox2847.opentlc.com/api/v1/repository
+  tasks:
+    - name: get id de reportes
+      uri:
+        url: "{{base_url}}/adminquay/servicenow?vulnerabilities=true"
+        headers:
+          Authorization: "{{ auth_token }}"
+        status_code: [200]
+        method: GET
+        body_format: json
+        validate_certs: no
+      register: _id_sha
+
+    - set_fact:
+        _list_tags: "{{_id_sha.json.tags}}"
+
+    - name: get to reports
+      uri:
+        url: "{{base_url}}/servicenow/test/manifest/{{item.value.manifest_digest}}/security?vulnerabilities=true"
+        headers:
+          Authorization: "{{ auth_admin }}"
+        status_code: [200]
+        method: GET
+        body_format: json
+        validate_certs: no
+      with_dict: "{{_list_tags}}"
+      register: _list_reports
+
+    - debug:
+        var: _list_reports
